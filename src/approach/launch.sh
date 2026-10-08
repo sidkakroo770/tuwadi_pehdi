@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ============================================================
-# AJAO-LELO-MERA
+# Tuwadi Pehdi approach launcher
 # ONE COMMAND LAUNCHER
 # ============================================================
 
@@ -11,16 +11,17 @@ set -e
 # PATHS — YOUR PC
 # ============================================================
 
-REPO="$HOME/Prem/ajao-lelo-mera"
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 VENV="$REPO/.venv"
 
 ARDUPILOT="$HOME/ardupilot"
 ARDUPILOT_GAZEBO="$HOME/ardupilot_gazebo"
 
-WORLD="$REPO/worlds/miss2_cam2_world.sdf"
+WORLD="$REPO/src/approach/worlds/miss2_cam2_world.sdf"
 
 # Your repository stores models here:
-MODEL_PATH="$REPO/models/models"
+MODEL_PATH="$REPO/simulation/models/models"
+export REPO WORLD MODEL_PATH
 
 # ArduPilot Gazebo plugin build directory
 PLUGIN_PATH="$ARDUPILOT_GAZEBO/build"
@@ -181,20 +182,20 @@ echo "[2/5] Starting Gazebo..."
 gnome-terminal \
     --title="1 - Gazebo MISS2" \
     -- bash -c '
-        cd ~/Prem/ajao-lelo-mera
+        cd "$REPO"
 
         source .venv/bin/activate
 
         export PYTHONPATH="/usr/lib/python3/dist-packages:${PYTHONPATH:-}"
 
-        export GZ_SIM_RESOURCE_PATH="$HOME/Prem/ajao-lelo-mera/models/models:$HOME/ardupilot_gazebo/models:${GZ_SIM_RESOURCE_PATH:-}"
+        export GZ_SIM_RESOURCE_PATH="$REPO/simulation/models/models:$HOME/ardupilot_gazebo/models:${GZ_SIM_RESOURCE_PATH:-}"
 
         export GZ_SIM_SYSTEM_PLUGIN_PATH="$HOME/ardupilot_gazebo/build:${GZ_SIM_SYSTEM_PLUGIN_PATH:-}"
 
         echo "WORLD:"
-        echo "$HOME/Prem/ajao-lelo-mera/worlds/miss2_cam2_world.sdf"
+        echo "$WORLD"
 
-        gz sim -r -v4 "$HOME/Prem/ajao-lelo-mera/worlds/miss2_cam2_world.sdf"
+        gz sim -r -v4 "$WORLD"
 
         exec bash
     '
