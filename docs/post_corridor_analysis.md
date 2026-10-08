@@ -27,7 +27,7 @@ Detailed evidence is retained in [post_corridor_review_evidence_2026-10-05](/hom
 
 | Stage | Current behavior and reference | Important boundary |
 | --- | --- | --- |
-| `CORRIDOR_EXITED` | Manager stops motion, checks a fixed local-NED field bounding box, then enters `ADVANCE_TO_FIELD`. `experimental_corridor_manager.py:2491–2521`, helper at `:360`. | A bounding-box check is not registration of the physical field or proof of roof clearance. |
+| `CORRIDOR_EXITED` | Manager stops motion, checks a fixed local-NED field bounding box, then enters `ADVANCE_TO_FIELD`. `mission_manager.py:2491–2521`, helper at `:360`. | A bounding-box check is not registration of the physical field or proof of roof clearance. |
 | `ADVANCE_TO_FIELD` | Commands 0.15 m/s north, correctly converted into body forward/right using measured yaw. Stops after reaching `n_min + clearance + 0.4`, then waits for horizontal speed below 0.10 m/s. `:2530–2568`. | Fixed northward entry and 12 source-second / 30 wall-second limits assume this world layout. |
 | `ASCEND_FOR_COVERAGE` | Converts the measured HOME/local-Z offset into a local target, climbs with bounded vertical speed, requires altitude/speed dwell and a clear-to-climb position envelope. `:2572–2593`, `corridor_altitude.py:36–95`. | The offset is sampled once; physical field elevation and safe ascent location remain external assumptions. |
 | Coverage startup | Stops the corridor command service, passes the same MAVLink connection to `coverage_mission.runtime.main`. `:2595–2621`. | One command owner is intentional and correct. There is a fresh synchronization/entry wait, not immediate sweep motion. |
@@ -47,8 +47,8 @@ Reproduction command:
 ```bash
 cd /home/sid/[competition]_mission2
 PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 \
-PYTHONPATH=/home/sid/[competition]_mission2:/home/sid/[competition]_mission2/approach:/home/sid/[competition]_mission2/corridor:/home/sid/[competition]_mission2/world/integration:/usr/lib/python3/dist-packages \
-python3 -c 'import coverage_mission, pytest; print("TESTED PACKAGE:", coverage_mission.__file__); raise SystemExit(pytest.main(["-q", "-p", "no:cacheprovider", "--rootdir=/home/sid/[competition]_mission2", "/home/sid/[competition]_mission2_coverage/tests", "/home/sid/[competition]_mission2/world/integration/test_coverage_handoff.py", "/home/sid/[competition]_mission2/coverage_mission/test_async_logs.py"]))'
+PYTHONPATH=/home/sid/[competition]_mission2:/home/sid/[competition]_mission2/approach:/home/sid/[competition]_mission2/corridor:/home/sid/[competition]_mission2/simulation/integration:/usr/lib/python3/dist-packages \
+python3 -c 'import coverage_mission, pytest; print("TESTED PACKAGE:", coverage_mission.__file__); raise SystemExit(pytest.main(["-q", "-p", "no:cacheprovider", "--rootdir=/home/sid/[competition]_mission2", "/home/sid/[competition]_mission2_coverage/tests", "/home/sid/[competition]_mission2/simulation/integration/test_coverage_handoff.py", "/home/sid/[competition]_mission2/coverage_mission/test_async_logs.py"]))'
 ```
 
 ### Fresh Gazebo campaigns against current coverage code
@@ -70,7 +70,7 @@ cd /home/sid/[competition]_mission2
 PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 \
 GZ_IP=127.0.0.1 GZ_DISCOVERY_MULTICAST_IP=239.255.0.23 \
 GZ_SIM_SYSTEM_PLUGIN_PATH=/home/sid/ardupilot_gazebo/build \
-GZ_SIM_RESOURCE_PATH=/home/sid/[competition]_mission2/world/models/models:/home/sid/ardupilot_gazebo/models \
+GZ_SIM_RESOURCE_PATH=/home/sid/[competition]_mission2/simulation/models/models:/home/sid/ardupilot_gazebo/models \
 PYTHONPATH=/home/sid/[competition]_mission2:/usr/lib/python3/dist-packages \
 python3 -u -m coverage_mission.campaign \
   --config /home/sid/[competition]_mission2_coverage/config/smoke.json \
@@ -121,7 +121,7 @@ Recent telemetry is not necessarily trustworthy telemetry. A real EKF failure ma
 
 ### P02 — Terminal send errors bypass cleanup and confuse handoff ownership
 
-**High; confirmed by fault probe.** `runtime.py:533–554`; [manager handoff:2604](/home/sid/[competition]_mission2/world/integration/experimental_corridor_manager.py:2604).
+**High; confirmed by fault probe.** `runtime.py:533–554`; [manager handoff:2604](/home/sid/[competition]_mission2/simulation/integration/mission_manager.py:2604).
 
 The final `hold()`/`velocity()` sends are outside a protective cleanup layer. A transport exception skips worker termination, log finalization and result writing. The probe raised an uncaught `OSError` and never joined its mock worker.
 
@@ -407,7 +407,7 @@ provisional; the front lens is unknown. No AI detector was introduced.
 - A new isolated Gazebo campaign was attempted, but this workspace's sandbox rejected socket creation before simulator startup (`PermissionError: Operation not permitted`). **No new Gazebo validation is claimed.** Run the updated full mission with the independent truth monitor and evaluate fence/red incursions, actual coverage, handoff and completion in a normal terminal. Existing older Gazebo results apply only to the earlier code revision.
 - Not yet ready for physical flight: the real Pi camera/time adapter is absent; optics/exposure/mount, FC failsafes, localization/geofence accuracy, vehicle margins and simultaneous Pi workload remain unmeasured. The flat-ground and open-air operating envelope remains explicit.
 
-The integrated source of truth is `[competition]_mission2/world/integration/FULL_MISSION_COVERAGE.md`; the manager and world handoffs carry the same current-status warning. QR, delivery and return remain out of scope.
+The integrated source of truth is `[competition]_mission2/simulation/integration/FULL_MISSION_COVERAGE.md`; the manager and world handoffs carry the same current-status warning. QR, delivery and return remain out of scope.
 
 ### Validation continuation — 2026-10-06
 
@@ -431,15 +431,15 @@ that real outdoor exposure or color thresholds are finalized.
 The first original 40 × 30 m re-run was interrupted by an environment restart
 before completion; its `/tmp` evidence was lost, so it cannot be counted as a
 pass. A new run from autonomous takeoff is underway with persistent evidence
-at `[competition]_mission2/world/integration/artifacts/full_recheck_20261006/`. Its
+at `[competition]_mission2/simulation/integration/artifacts/full_recheck_20261006/`. Its
 full-field result is **pending**; partial safe traces are not a completion
 claim. The latest executable status is in
-`[competition]_mission2/world/integration/FULL_MISSION_COVERAGE.md`.
+`[competition]_mission2/simulation/integration/FULL_MISSION_COVERAGE.md`.
 
 ### Full-world liveness correction — 2026-10-06
 
 The persistent original-world rerun at
-`[competition]_mission2/world/integration/artifacts/full_recheck_20261006/` reached
+`[competition]_mission2/simulation/integration/artifacts/full_recheck_20261006/` reached
 coverage but did **not** complete: pending/unseen counts stopped improving
 while the aircraft repeated a safe route. The saved map showed many small
 enclosed dark-texture observation holes inside a large unexplored exterior.
@@ -458,10 +458,10 @@ independent evaluator: `COMPLETE`, zero red incursions, zero fence violations,
 zero permissible gaps, 0.099 m maximum projected-corner error, 0.025 m
 maximum straight-leg cross-track error and 0.227 m maximum credited-route
 cross-track error. Evidence:
-`[competition]_mission2/world/integration/artifacts/isolated_after_frontier_fix/evaluation.json`.
+`[competition]_mission2/simulation/integration/artifacts/isolated_after_frontier_fix/evaluation.json`.
 The finite current-code test selection passed **59 tests**. The original-world
 rerun from autonomous takeoff remains in progress at
-`[competition]_mission2/world/integration/artifacts/full_frontier_20261006/` and is
+`[competition]_mission2/simulation/integration/artifacts/full_frontier_20261006/` and is
 **not yet a validated complete mission**. Real Pi camera timing/calibration,
 simultaneous hardware load and FC failsafes remain hardware work.
 
@@ -480,7 +480,7 @@ full-world green-texture evidence scale is provisionally 1.0 m instead of
 0.4 m; a large pure-black patch still remains unknown in a new test.
 **60 finite tests pass.** A 1× full-world rerun from autonomous takeoff is
 currently collecting evidence under
-`[competition]_mission2/world/integration/artifacts/full_paint_20261006/`. Its result is
+`[competition]_mission2/simulation/integration/artifacts/full_paint_20261006/`. Its result is
 pending; neither earlier partial run is a completed mission pass.
 
 ### Checked-relocation watchdog follow-up — 2026-10-07
@@ -498,7 +498,7 @@ from the last coverage/map progress point, with a provisional 0.20 m/s
 connector assumption and a field-diagonal cap. A repeated loop cannot reset
 the allowance indefinitely. **61 finite tests pass.** A new 1× original-world
 flight plus independent truth monitor is running in
-`[competition]_mission2/world/integration/artifacts/full_relocation_20261007/`.
+`[competition]_mission2/simulation/integration/artifacts/full_relocation_20261007/`.
 Completion and evaluator status remain pending; Pi timing and hardware
 calibration remain separate unvalidated work.
 
@@ -544,7 +544,7 @@ zero-command HOLD decisions. Truth again showed zero red/fence incursions,
 but the flight was incomplete. Completion accounting, direct checked frontier
 selection and zero-HOLD admission received targeted changes; 68 selected
 offline/integration tests pass. No confirming full Gazebo flight has occurred.
-Details and artifacts: `[competition]_mission2/world/integration/FULL_MISSION_COVERAGE.md`.
+Details and artifacts: `[competition]_mission2/simulation/integration/FULL_MISSION_COVERAGE.md`.
 
 Current provisional Gazebo rule: dark/black pixels in fresh, correctly shaped
 downward-camera frames are clear if the red detector does not mark them red.
@@ -557,7 +557,7 @@ tests and two saved-map replays pass; integrated Gazebo completion remains
 unproven.
 
 The later staged original-world flight in
-`[competition]_mission2/world/integration/artifacts/full_corridor1x_20261007` reached
+`[competition]_mission2/simulation/integration/artifacts/full_corridor1x_20261007` reached
 manager and coverage `COMPLETE` with zero planner timeouts and zero sampled
 red/fence incursions. Corridor ran at the proven 1× rate; synchronized
 Gazebo/SITL coverage ran at 2×. Independent truth found a 0.143 m maximum

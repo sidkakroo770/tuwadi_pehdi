@@ -22,16 +22,16 @@ The return must start only from a confirmed target match and a successfully comp
 | `coverage_mission/qr.py: QRConfig.final_dwell` | Default dwell is 2 seconds, despite the state name `TARGET_HOLD_5M`; “5M” means altitude, not duration. | Set the full-return profile to a measured 5-second settled dwell. Do not add a blind sleep. |
 | `coverage_mission/qr.py: Inspection.step` | Target identity is latched, coverage is cancelled, horizontal centring is maintained during descent, and dwell resets when measured settling conditions fail. | Keep these mechanisms and make the successful hold an explicit return-start event. |
 | `coverage_mission/runtime.py: run` | `TARGET_HOLD_5M` currently ends the session; final cleanup terminates workers. | Keep the live ground map and safety session through field return instead of exiting and rebuilding them. |
-| `world/integration/experimental_corridor_manager.py: COVERAGE branch` | A successful field runtime currently leads to `COMPLETE`. | Add explicit target-hold → return dispatch; generic success must not imply permission to return. |
-| `world/integration/entrance_readiness.py: StagingEnvelope` | Fixed outbound bounds: N [-31.5,-29], E [-6,-2], HOME altitude [1.5,5] m. | These bounds cannot admit the orange entrance. Use separate outbound and return approach profiles. |
-| `experimental_corridor_manager.py: CORRIDOR_EXITED branch` | Every corridor exit currently advances into the field and starts ascent/coverage. | Dispatch by traversal role: outbound exit enters the field; return exit proceeds to exterior landing. |
+| `simulation/integration/mission_manager.py: COVERAGE branch` | A successful field runtime currently leads to `COMPLETE`. | Add explicit target-hold → return dispatch; generic success must not imply permission to return. |
+| `simulation/integration/entrance_readiness.py: StagingEnvelope` | Fixed outbound bounds: N [-31.5,-29], E [-6,-2], HOME altitude [1.5,5] m. | These bounds cannot admit the orange entrance. Use separate outbound and return approach profiles. |
+| `mission_manager.py: CORRIDOR_EXITED branch` | Every corridor exit currently advances into the field and starts ascent/coverage. | Dispatch by traversal role: outbound exit enters the field; return exit proceeds to exterior landing. |
 | `corridor/native/mission_runner.py` | Existing runner owns entry, cruise, obstacle handling, reassessment and exit controllers. | Reuse the runner implementation with a fresh return instance, rather than copying an entire FSM. |
 | `corridor/native/controllers/exit_detection.py: projected_travel` | Exit progress is actual displacement projected onto the latched start heading, not always northward displacement. | This mechanism supports southbound return; reverse obstacle observations still need testing. |
 | `coverage_mission/engine.py: Engine.step` | Field inset, observed-free map, red residence, pose continuity, freshness and stopping-region checks precede inspection commands. | Keep these protections for return routing and vertical phases; do not restart sweep scheduling. |
 | `coverage_mission/planning.py: route` | Routes use reachable observed-free cells and can choose checked frontier viewpoints when the goal is not yet reachable; planning has a wall-time budget. | Useful return-routing foundation, but the coverage-oriented frontier ranking and arrival-disk substitution need return-specific acceptance rules. |
-| `experimental_corridor_manager.py: request_land / confirm_terminal_land` | Normal LAND request stops the velocity service; confirmation checks fresh LAND mode, not touchdown. | Reuse the normal command path, then add a separate touchdown/disarm monitor. |
-| `experimental_corridor_manager.py: drain_mavlink` | Leaving GUIDED or becoming disarmed revokes mission authority. | Explicitly distinguish authorized LAND/touchdown from pilot takeover without allowing further velocity commands. |
-| `world/worlds/miss2_full_world.sdf: orange_banner` | Orange visual already exists at world (4.1,-20,3.548), with the green banner's dimensions and orientation. | Use it as the return fixture; its placement has XML checks, not return-flight validation. |
+| `mission_manager.py: request_land / confirm_terminal_land` | Normal LAND request stops the velocity service; confirmation checks fresh LAND mode, not touchdown. | Reuse the normal command path, then add a separate touchdown/disarm monitor. |
+| `mission_manager.py: drain_mavlink` | Leaving GUIDED or becoming disarmed revokes mission authority. | Explicitly distinguish authorized LAND/touchdown from pilot takeover without allowing further velocity commands. |
+| `simulation/worlds/miss2_full_world.sdf: orange_banner` | Orange visual already exists at world (4.1,-20,3.548), with the green banner's dimensions and orientation. | Use it as the return fixture; its placement has XML checks, not return-flight validation. |
 
 The native corridor runner's relevant states include `PRE_ENTRY_GEOMETRY_LOCK`, `ENTER_CORRIDOR`, `CORRIDOR_CRUISE`, `OBSTACLE_DECISION`, `HOVER_AND_REASSESS`, `EXIT_DETECTION` and `CORRIDOR_EXITED`.
 
@@ -204,13 +204,13 @@ Rates, camera exposure, calibrated FOV, exact entry gains, thermal limits and wo
 
 | Order | Work | Primary locations |
 | --- | --- | --- |
-| 1 | Add return configuration, traversal role, phase contracts and offline tests before motion changes. | `world/integration/experimental_corridor_manager.py`, new return configuration/module as needed, `config/` |
+| 1 | Add return configuration, traversal role, phase contracts and offline tests before motion changes. | `simulation/integration/mission_manager.py`, new return configuration/module as needed, `config/` |
 | 2 | Make the 5-second hold a supervised event; retain the live map session; suppress QR/sweep work after match. | `coverage_mission/qr.py`, `coverage_mission/runtime.py`, `coverage_mission/engine.py` |
 | 3 | Add bounded goal-directed return routing, ascent/stand-off phases and manager-owned authority transitions. | Shared field runtime, `coverage_mission/planning.py`, `coverage_mission/geometry.py` only where required |
-| 4 | Parameterize orange acquisition and outbound/return staging; implement narrow entrance-region handoff. | `approach/autonomy/perception/hybrid_banner_detector.py`, `world/integration/entrance_readiness.py`, manager |
+| 4 | Parameterize orange acquisition and outbound/return staging; implement narrow entrance-region handoff. | `approach/autonomy/perception/hybrid_banner_detector.py`, `simulation/integration/entrance_readiness.py`, manager |
 | 5 | Reuse a fresh native FSM and role-specific exit dispatch; fix demonstrated reverse-direction defects only. | `corridor/native/mission_runner.py` and existing controllers if tests reveal defects |
 | 6 | Add exterior egress, expected LAND authority transition and actual touchdown/disarm confirmation. | Manager and shared telemetry/command helpers |
-| 7 | Add independent truth validation and update launch instructions/handoffs. | `world/integration/qr_gazebo_validation.py`, new return evaluator/tests, `HANDOFF.md`, QR status and integration handoffs |
+| 7 | Add independent truth validation and update launch instructions/handoffs. | `simulation/integration/qr_gazebo_validation.py`, new return evaluator/tests, `HANDOFF.md`, QR status and integration handoffs |
 
 Implementation should preserve the existing outbound mission, coverage-only mode and QR-only endpoint as explicit regression profiles. The default full mission changes from stopping at target hold to finishing the return and landing.
 

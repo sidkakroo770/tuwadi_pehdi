@@ -16,7 +16,7 @@ The source was not modified. No aircraft connection, arm command, flight command
 
 ### What was reviewed
 
-The active full mission is `world/integration/experimental_corridor_manager.py`, not the old standalone approach script or the ROS corridor copies. I traced its imported native controllers, sensor callbacks, telemetry handling, output commands, altitude helper, and transitions through `ASCEND_FOR_COVERAGE`. Coverage planning, boustrophedon motion, and red-zone avoidance themselves are excluded.
+The active full mission is `simulation/integration/mission_manager.py`, not the old standalone approach script or the ROS corridor copies. I traced its imported native controllers, sensor callbacks, telemetry handling, output commands, altitude helper, and transitions through `ASCEND_FOR_COVERAGE`. Coverage planning, boustrophedon motion, and red-zone avoidance themselves are excluded.
 
 I also inspected the separate native hardware runner and its LiDAR/MAVLink dependencies because those are the repository's existing hardware-facing implementation. Their safeguards must not be attributed to the full Gazebo manager unless actually connected to it.
 
@@ -30,24 +30,24 @@ All source references below are to the inspected files and line numbers; line ra
 
 | Key | File / role |
 | --- | --- |
-| M | [world/integration/experimental_corridor_manager.py](/home/sid/[competition]_mission2/world/integration/experimental_corridor_manager.py) — active full-mission wrapper |
-| A | [world/integration/corridor_altitude.py](/home/sid/[competition]_mission2/world/integration/corridor_altitude.py) — descent/climb controller |
-| H | [world/integration/corridor_handoff.py](/home/sid/[competition]_mission2/world/integration/corridor_handoff.py) — front-range approach trigger |
-| B | [approach/autonomy/perception/hybrid_banner_detector.py](/home/sid/[competition]_mission2/approach/autonomy/perception/hybrid_banner_detector.py) — active green-banner detector |
-| N | [corridor/native/mission_runner.py](/home/sid/[competition]_mission2/corridor/native/mission_runner.py) — native state supervisor |
-| P | [corridor/native/controllers/pre_entry.py](/home/sid/[competition]_mission2/corridor/native/controllers/pre_entry.py) — wall geometry and entry alignment |
-| C | [corridor/native/controllers/corridor_cruise.py](/home/sid/[competition]_mission2/corridor/native/controllers/corridor_cruise.py) — cruise, correction, exit candidates |
-| O | [corridor/native/controllers/obstacle_avoidance.py](/home/sid/[competition]_mission2/corridor/native/controllers/obstacle_avoidance.py) — obstacle classification, SHIFT/PASS |
-| R | [corridor/native/controllers/hover_and_reassess.py](/home/sid/[competition]_mission2/corridor/native/controllers/hover_and_reassess.py) — recovery |
-| E | [corridor/native/controllers/exit_detection.py](/home/sid/[competition]_mission2/corridor/native/controllers/exit_detection.py) — measured exit commit |
-| T | [corridor/native/run_corridor_real.py](/home/sid/[competition]_mission2/corridor/native/run_corridor_real.py) — separate hardware runner |
-| D | [corridor/native/hardware/d500_driver.py](/home/sid/[competition]_mission2/corridor/native/hardware/d500_driver.py) — serial LiDAR parser |
-| I | [corridor/native/hardware/mavlink_io.py](/home/sid/[competition]_mission2/corridor/native/hardware/mavlink_io.py) — hardware telemetry reader |
-| S | [corridor/native/hardware/mavlink_sender.py](/home/sid/[competition]_mission2/corridor/native/hardware/mavlink_sender.py) — gated hardware sender |
-| SA | [corridor/native/common/scan_adapter.py](/home/sid/[competition]_mission2/corridor/native/common/scan_adapter.py) — raw scan to FLU conversion |
-| VM | [world/models/models/iris_miss2_full/model.sdf](/home/sid/[competition]_mission2/world/models/models/iris_miss2_full/model.sdf) — tested simulated sensors |
-| FW | [world/worlds/miss2_full_world.sdf](/home/sid/[competition]_mission2/world/worlds/miss2_full_world.sdf) — full-world placement/banner |
-| Run notes | [world/integration/FULL_MISSION_COVERAGE.md](/home/sid/[competition]_mission2/world/integration/FULL_MISSION_COVERAGE.md) |
+| M | [simulation/integration/mission_manager.py](/home/sid/[competition]_mission2/simulation/integration/mission_manager.py) — active full-mission wrapper |
+| A | [simulation/integration/corridor_altitude.py](/home/sid/[competition]_mission2/simulation/integration/corridor_altitude.py) — descent/climb controller |
+| H | [simulation/integration/corridor_handoff.py](/home/sid/[competition]_mission2/simulation/integration/corridor_handoff.py) — front-range approach trigger |
+| B | [approach/autonomy/perception/hybrid_banner_detector.py](/home/sid/[competition]_mission2/src/approach/autonomy/perception/hybrid_banner_detector.py) — active green-banner detector |
+| N | [corridor/native/mission_runner.py](/home/sid/[competition]_mission2/src/corridor/native/mission_runner.py) — native state supervisor |
+| P | [corridor/native/controllers/pre_entry.py](/home/sid/[competition]_mission2/src/corridor/native/controllers/pre_entry.py) — wall geometry and entry alignment |
+| C | [corridor/native/controllers/corridor_cruise.py](/home/sid/[competition]_mission2/src/corridor/native/controllers/corridor_cruise.py) — cruise, correction, exit candidates |
+| O | [corridor/native/controllers/obstacle_avoidance.py](/home/sid/[competition]_mission2/src/corridor/native/controllers/obstacle_avoidance.py) — obstacle classification, SHIFT/PASS |
+| R | [corridor/native/controllers/hover_and_reassess.py](/home/sid/[competition]_mission2/src/corridor/native/controllers/hover_and_reassess.py) — recovery |
+| E | [corridor/native/controllers/exit_detection.py](/home/sid/[competition]_mission2/src/corridor/native/controllers/exit_detection.py) — measured exit commit |
+| T | [corridor/native/run_corridor_real.py](/home/sid/[competition]_mission2/src/corridor/native/run_corridor_real.py) — separate hardware runner |
+| D | [corridor/native/hardware/d500_driver.py](/home/sid/[competition]_mission2/src/corridor/native/hardware/d500_driver.py) — serial LiDAR parser |
+| I | [corridor/native/hardware/mavlink_io.py](/home/sid/[competition]_mission2/src/corridor/native/hardware/mavlink_io.py) — hardware telemetry reader |
+| S | [corridor/native/hardware/mavlink_sender.py](/home/sid/[competition]_mission2/src/corridor/native/hardware/mavlink_sender.py) — gated hardware sender |
+| SA | [corridor/native/common/scan_adapter.py](/home/sid/[competition]_mission2/src/corridor/native/common/scan_adapter.py) — raw scan to FLU conversion |
+| VM | [simulation/models/models/iris_miss2_full/model.sdf](/home/sid/[competition]_mission2/simulation/models/models/iris_miss2_full/model.sdf) — tested simulated sensors |
+| FW | [simulation/worlds/miss2_full_world.sdf](/home/sid/[competition]_mission2/simulation/worlds/miss2_full_world.sdf) — full-world placement/banner |
+| Run notes | [simulation/integration/FULL_MISSION_COVERAGE.md](/home/sid/[competition]_mission2/simulation/integration/FULL_MISSION_COVERAGE.md) |
 | Requirements | [autonomous mission_[competition]_[competition].pdf](</home/sid/[competition]_mission2/autonomous mission_[competition]_[competition].pdf>) |
 
 ### Interpretation of labels
@@ -497,7 +497,7 @@ Existing tests were run with:
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 \
-PYTHONPATH=/home/sid/[competition]_mission2/corridor:/home/sid/[competition]_mission2/world/integration \
+PYTHONPATH=/home/sid/[competition]_mission2/corridor:/home/sid/[competition]_mission2/simulation/integration \
 python3 -m unittest native.test_exit_clock test_corridor_altitude -q
 ```
 

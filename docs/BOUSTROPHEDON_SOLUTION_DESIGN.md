@@ -51,10 +51,10 @@ Relevant local references:
 - [Archived sweep prototype](../archive/legacy/boustrophedon_sweep_prototype.py)
 - [Previous audit](reviews/boustrophedon_review.md)
 - [Coverage generator](/home/sid/coverage_ws/generate_waypoints.py)
-- [Canonical world handoff](/home/sid/[competition]_mission2/world/HANDOFF.md)
-- [Independent corridor experiment](/home/sid/[competition]_mission2/world/experiments/corridor_only/README.md)
-- [Existing camera mission startup](/home/sid/[competition]_mission2/world/automation_ki_baat_cheet/miss2_start.py:162)
-- [Existing staging takeoff](/home/sid/[competition]_mission2/world/integration/stage_near_corridor.py:145)
+- [Canonical world handoff](/home/sid/[competition]_mission2/simulation/HANDOFF.md)
+- [Independent corridor experiment](/home/sid/[competition]_mission2/simulation/experiments/corridor_only/README.md)
+- [Existing camera mission startup](/home/sid/[competition]_mission2/simulation/mission_tools/miss2_start.py:162)
+- [Existing staging takeoff](/home/sid/[competition]_mission2/simulation/integration/stage_near_corridor.py:145)
 
 The handoff and launch scripts establish the following existing setup:
 
@@ -63,7 +63,7 @@ The handoff and launch scripts establish the following existing setup:
 | Simulator | Gazebo Harmonic; gz.transport13 and gz.msgs10 |
 | Autopilot | ArduCopter SITL, gazebo-iris frame, JSON physics connection |
 | Plugin location | /home/sid/ardupilot_gazebo/build |
-| Full-world file | /home/sid/[competition]_mission2/world/worlds/miss2_full_world.sdf |
+| Full-world file | /home/sid/[competition]_mission2/simulation/worlds/miss2_full_world.sdf |
 | Full-world vehicle | iris_miss2_full, with both camera topics |
 | Image topics | /iris/camera_forward/image_raw and /iris/camera_downward/image_raw |
 | Documented full-world partition | miss2_local |
@@ -71,7 +71,7 @@ The handoff and launch scripts establish the following existing setup:
 | Physics / SITL ports | 9002 / TCP 5760 |
 | MAVProxy outputs | UDP 14550 and 14552; experimental runner convention uses 14552 |
 | Python setup | PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python; Gazebo bindings available through /usr/lib/python3/dist-packages |
-| Network setup | Existing loopback/multicast environment is recorded in world/HANDOFF.md and experiment scripts |
+| Network setup | Existing loopback/multicast environment is recorded in simulation/HANDOFF.md and experiment scripts |
 
 The independent corridor scripts already demonstrate separation of experiment configuration, SITL state/log directories, and launch stages. Reuse that pattern for coverage. The corridor-only vehicle has no cameras, so it cannot be used unchanged for this experiment.
 

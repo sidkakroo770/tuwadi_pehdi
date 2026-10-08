@@ -16,11 +16,11 @@ QR discovery is capped at 5 Hz. Payload decoding is capped at 2 Hz and authorize
 
 Hierarchy:
 
-1. The global mission manager owns phase transitions and hands over a leased command token (`world/integration/experimental_corridor_manager.py:2768`). The field runtime temporarily becomes the sole MAVLink reader; the manager does not run a competing telemetry/control loop during that call.
+1. The global mission manager owns phase transitions and hands over a leased command token (`simulation/integration/mission_manager.py:2768`). The field runtime temporarily becomes the sole MAVLink reader; the manager does not run a competing telemetry/control loop during that call.
 2. The field supervisor validates FC authority, pose, clock, camera and decision freshness before admitting motion (`coverage_mission/runtime.py`, main control loop).
 3. The engine arbitrates field fence, red-zone residence/escape, attitude, observation validity and stopping clearance (`coverage_mission/engine.py:194`). It can veto a QR proposal.
 4. QR inspection takes priority over ordinary sweep navigation only when those safety checks admit it. Sweep motion and coverage credit pause while centering/reading/descending; red mapping and residence timing do not pause.
-5. `world/integration/command_service.py:11` is the single velocity sender. Its stage token rejects old publishers, and its 0.30 s command lease expires to zero translation. FC/pilot mode changes remain above autonomous navigation authority.
+5. `simulation/integration/command_service.py:11` is the single velocity sender. Its stage token rejects old publishers, and its 0.30 s command lease expires to zero translation. FC/pilot mode changes remain above autonomous navigation authority.
 
 The important distinction is **simultaneous perception, not simultaneous conflicting steering**. QR centering/descent and boustrophedon steering never independently command the aircraft at the same time.
 
@@ -28,7 +28,7 @@ Within each field worker job, live image mapping occurs before QR inspection, an
 
 ## Short Gazebo tests actually run
 
-These are owned field-start fixtures using the real global manager, autonomous takeoff, Gazebo camera images, QR decoding, SITL, field engine and leased sender. They intentionally inject the known fixture reference `REF-001` and skip initial QR/corridor/return. They are not new end-to-end validations of those stages.
+These are owned field-start fixtures using the real global manager, autonomous takeoff, Gazebo camera images, QR decoding, SITL, field engine and leased sender. They intentionally inject the known fixture reference `REF-001` and skip initial QR, corridor and return. They are not new end-to-end validations of those stages.
 
 The existing red rectangle is N ∈ [−9,−6], E ∈ [−4,−2]. The test QR is the existing 1 m black-and-white printed marker, moved only in a private copied fixture. Production worlds and QR assets were not changed. Aircraft starts at N=−10.2, E=−3.8 and takes off to 10 m. The configured planner clearance is 0.70 m, comprising 0.40 m body radius plus 0.30 m provisional uncertainty.
 
@@ -57,8 +57,8 @@ The reachable case also passed independent HOME-relative altitude and stationary
 
 Evidence directories:
 
-- `world/integration/artifacts/qr_near_red_20261008_01/`
-- `world/integration/artifacts/qr_too_close_red_20261008_01/`
+- `simulation/integration/artifacts/qr_near_red_20261008_01/`
+- `simulation/integration/artifacts/qr_too_close_red_20261008_01/`
 
 Each contains fixture/world copies, independent truth, camera/QR results, decisions, supervision commands, final map and `qr_red_evaluation.json`. The evaluator is `coverage_mission/evaluate_qr_red_run.py`.
 
@@ -89,11 +89,11 @@ No mission priority, safety margin, threshold or normal flight behaviour needed 
 Run from the repository root, with no existing simulator occupying port 5760; use a fresh output directory each time:
 
 ```bash
-python3 -m world.integration.qr_gazebo_validation --scenario qr-near-red --seconds 160 --gui --output world/integration/artifacts/qr_near_red_manual_01
-python3 -m coverage_mission.evaluate_qr_red_run world/integration/artifacts/qr_near_red_manual_01
+python3 -m simulation.integration.qr_gazebo_validation --scenario qr-near-red --seconds 160 --gui --output simulation/integration/artifacts/qr_near_red_manual_01
+python3 -m coverage_mission.evaluate_qr_red_run simulation/integration/artifacts/qr_near_red_manual_01
 
-python3 -m world.integration.qr_gazebo_validation --scenario qr-too-close-red --seconds 100 --gui --output world/integration/artifacts/qr_too_close_red_manual_01
-python3 -m coverage_mission.evaluate_qr_red_run world/integration/artifacts/qr_too_close_red_manual_01
+python3 -m simulation.integration.qr_gazebo_validation --scenario qr-too-close-red --seconds 100 --gui --output simulation/integration/artifacts/qr_too_close_red_manual_01
+python3 -m coverage_mission.evaluate_qr_red_run simulation/integration/artifacts/qr_too_close_red_manual_01
 ```
 
 The `--gui` option enables mission camera/map diagnostics; the Gazebo server remains headless. The harness stops only the processes it creates. All owned processes from the recorded runs have been stopped.

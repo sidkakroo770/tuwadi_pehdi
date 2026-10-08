@@ -51,10 +51,10 @@ Implementation date: 2026-10-08. This extends the [competition] mission; physica
 - `coverage_mission/qr_detector.py`: shared detector/selected-marker decoder. The earlier approach detector imports this implementation.
 - `coverage_mission/qr.py`: configuration, isolated worker/service, inspection state machine and marker ledger.
 - `coverage_mission/runtime.py`, `coverage_mission/engine.py`: integration with the existing supervision/map/control path.
-- `world/integration/experimental_corridor_manager.py`: initial scan and reference/command/read-owner handoffs.
+- `simulation/integration/mission_manager.py`: initial scan and reference/command/read-owner handoffs.
 - `config/qr_mission.json`: provisional centering, rate, confirmation, timeout and descent limits.
-- `world/integration/build_qr_assets.py`: reproducible texture generation and environment visual stripping; preserves the original collision asset.
-- `world/integration/qr_gazebo_validation.py`: owned-process validation harness; never kills unrelated processes.
+- `simulation/integration/build_qr_assets.py`: reproducible texture generation and environment visual stripping; preserves the original collision asset.
+- `simulation/integration/qr_gazebo_validation.py`: owned-process validation harness; never kills unrelated processes.
 - `coverage_mission/evaluate_qr_run.py`: independent early-target evaluator. Full-field completion is deliberately not required after a match.
 - `requirements/qr.txt`: pinned runtime decoder and fixture-generator packages. Runtime also needs `libzbar0`.
 
@@ -65,11 +65,11 @@ Run from the repository root, with Gazebo, the existing ArduPilot build and MAVP
 ```bash
 python3 -m pip install --user -r requirements/qr.txt
 # If libzbar is missing: sudo apt install libzbar0
-python3 world/integration/build_qr_assets.py
-python3 -m world.integration.qr_gazebo_validation \
-  --output world/integration/artifacts/qr_manual_run --seconds 600 --gui
+python3 simulation/integration/build_qr_assets.py
+python3 -m simulation.integration.qr_gazebo_validation \
+  --output simulation/integration/artifacts/qr_manual_run --seconds 600 --gui
 python3 -m coverage_mission.evaluate_qr_run \
-  world/integration/artifacts/qr_manual_run
+  simulation/integration/artifacts/qr_manual_run
 ```
 
 Use a fresh output directory for each run. `--seconds` is the test harness watchdog, not a competition time-optimization policy. The camera/map GUI is shown with `--gui`; press the displayed mission quit key only to request an abort. This harness closes the simulator after the segment finishes. It does not run a return or payload sequence.
@@ -77,8 +77,8 @@ Use a fresh output directory for each run. `--seconds` is the test harness watch
 For the bounded missing-reference test:
 
 ```bash
-python3 -m world.integration.qr_gazebo_validation \
-  --output world/integration/artifacts/qr_missing_reference \
+python3 -m simulation.integration.qr_gazebo_validation \
+  --output simulation/integration/artifacts/qr_missing_reference \
   --scenario missing-reference --seconds 150
 ```
 
@@ -86,7 +86,7 @@ The full manager defaults to the QR mission and a 5 m startup. Existing coverage
 
 ## Validation record
 
-The GUI-enabled integrated mission in `world/integration/artifacts/qr_full_20261008_05` passed the independent early-target evaluator. Sequence: autonomous takeoff → measured startup advance → settled initial reference → banner/corridor → field inspection of a nonmatch → coverage resumption → matching marker → cancellation of remaining coverage → descent and verified `TARGET_HOLD_5M`.
+The GUI-enabled integrated mission in `simulation/integration/artifacts/qr_full_20261008_05` passed the independent early-target evaluator. Sequence: autonomous takeoff → measured startup advance → settled initial reference → banner/corridor → field inspection of a nonmatch → coverage resumption → matching marker → cancellation of remaining coverage → descent and verified `TARGET_HOLD_5M`.
 
 | Measured result | Evidence |
 |---|---|

@@ -40,15 +40,15 @@ A lower-altitude forward approach cannot necessarily see enough new ground to ce
 | Focused return state/geometry/approach tests | Included in the final suite; distinct frames, stale data, bounded search, heading, region and touchdown/disarm gates covered |
 | Saved-map return replay | Passed: ascent → entrance survey → stand-off route → acquisition descent → front approach admission |
 | Replay source duration | 71.9 seconds, 720 synthetic samples |
-| Replay evidence | `world/integration/artifacts/return_replay_20261008_01/result.json` |
+| Replay evidence | `simulation/integration/artifacts/return_replay_20261008_01/result.json` |
 | First full flight | Retained failure before return: outbound scan/pose freshness expired; supervisor stopped and confirmed LAND |
-| First failure evidence | `world/integration/artifacts/return_full_20261008_01/` |
+| First failure evidence | `simulation/integration/artifacts/return_full_20261008_01/` |
 | Second full flight | Retained failure: safety HOLD restored outbound yaw during return ascent; pose-continuity supervision aborted |
-| Second failure evidence | `world/integration/artifacts/return_full_20261008_02/` |
+| Second failure evidence | `simulation/integration/artifacts/return_full_20261008_02/` |
 | Targeted return-only Gazebo flight, GUI enabled | Passed orange acquisition, positive wall handoff, reverse corridor, exterior LAND and on-ground/disarmed confirmation |
-| Targeted flight evidence | `world/integration/artifacts/return_entry_20261008_01/return_evaluation.json` |
+| Targeted flight evidence | `simulation/integration/artifacts/return_entry_20261008_01/return_evaluation.json` |
 | Complete default mission, GUI enabled | Passed all 18 independent evaluator checks, including initial/target QR, five-second hold, return routing, both exits and landing |
-| Full-flight evidence | `world/integration/artifacts/return_full_20261008_03/return_evaluation.json` |
+| Full-flight evidence | `simulation/integration/artifacts/return_full_20261008_03/return_evaluation.json` |
 | Full-flight hold | 5.0007545 measured source seconds; 296 independent truth samples |
 | Worst independent target-hold position error | 0.04166 m, below the unchanged 0.25 m limit |
 | Peak independent target-hold speed | 0.09683 m/s, below the unchanged 0.10 m/s limit |
@@ -70,9 +70,9 @@ Across 3,227 logged return-worker samples in the full flight, processing time wa
 From the repository root, use the owned-process harness:
 
 ```bash
-python3 -m world.integration.qr_gazebo_validation \
+python3 -m simulation.integration.qr_gazebo_validation \
   --return-mission --gui \
-  --output world/integration/artifacts/return_manual_01 \
+  --output simulation/integration/artifacts/return_manual_01 \
   --seconds 1000
 ```
 
@@ -82,15 +82,15 @@ Independent return evaluation, after a completed run:
 
 ```bash
 python3 -m coverage_mission.evaluate_return_run \
-  world/integration/artifacts/return_manual_01
+  simulation/integration/artifacts/return_manual_01
 ```
 
 For a shorter return-only fixture with fresh autonomous takeoff (not a permissive restart of the normal mission):
 
 ```bash
-python3 -m world.integration.qr_gazebo_validation \
+python3 -m simulation.integration.qr_gazebo_validation \
   --scenario return-entry --gui \
-  --output world/integration/artifacts/return_entry_manual_01 \
+  --output simulation/integration/artifacts/return_entry_manual_01 \
   --seconds 700
 ```
 
@@ -111,9 +111,9 @@ The current milestone uses the orange return banner, a five-second delivery surr
 ## Important files
 
 - `coverage_mission/return_mission.py`: bounded field return and narrow entrance permit.
-- `world/integration/return_approach.py`: manager-owned front-camera/LiDAR proposal producer.
+- `simulation/integration/return_approach.py`: manager-owned front-camera/LiDAR proposal producer.
 - `coverage_mission/runtime.py`: retained map/safety session and explicit return handoff.
-- `world/integration/experimental_corridor_manager.py`: traversal dispatch, corridor reuse, exterior egress and landing.
+- `simulation/integration/mission_manager.py`: traversal dispatch, corridor reuse, exterior egress and landing.
 - `coverage_mission/replay_return_map.py`: saved-map regression.
 - `coverage_mission/evaluate_return_run.py`: independent truth evaluation.
-- `coverage_mission/test_return_mission.py`, `world/integration/test_return_approach.py`: offline return contracts.
+- `coverage_mission/test_return_mission.py`, `simulation/integration/test_return_approach.py`: offline return contracts.

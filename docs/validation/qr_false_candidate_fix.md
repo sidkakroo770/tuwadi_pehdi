@@ -4,7 +4,7 @@ Date: 2026-10-08. Applies to the [competition] field QR mission.
 
 ## Confirmed failure
 
-The user's full run is retained under `world/integration/artifacts/full_near_red_manual_01/`. Initial reference acquisition succeeded; the field runtime correctly read `OTHER-001`, then repeatedly selected spurious ground detections. There were 14 candidate IDs at shutdown, 3,097 logged `QR_CENTER` decisions and no matching target confirmation. The run ended by keyboard interruption.
+The user's full run is retained under `simulation/integration/artifacts/full_near_red_manual_01/`. Initial reference acquisition succeeded; the field runtime correctly read `OTHER-001`, then repeatedly selected spurious ground detections. There were 14 candidate IDs at shutdown, 3,097 logged `QR_CENTER` decisions and no matching target confirmation. The run ended by keyboard interruption.
 
 The detector accepted polygons based on finite coordinates and area alone. For example, a logged candidate had corners `(345,477), (213,317), (637,-394), (637,329)` in a 640×480 image. It was marked incomplete but nevertheless projected onto the ground, entered the candidate ledger and became eligible for centering. Reading required a complete live marker, so this candidate could not finish its inspection. Timers bounded individual attempts, but different false IDs bypassed the intended two-attempt limit across the scene. Stale candidates could also be selected without fresh evidence.
 
@@ -37,7 +37,7 @@ The existing camera acquisition, bounded queues, one-in-flight QR worker, red sa
 - 71 genuine marker observations retained; every retained projected centre lies within 0.30 m of a physical fixture marker.
 - All three actual stationary `OTHER-001` payload exposures retained.
 
-Result: `world/integration/artifacts/full_near_red_manual_01/qr_geometry_fix_replay.json`, PASS.
+Result: `simulation/integration/artifacts/full_near_red_manual_01/qr_geometry_fix_replay.json`, PASS.
 
 This is geometry replay, not a rerun of OpenCV on saved pixels or a simulation of the changed trajectory. An exploratory state replay is retained as `qr_fix_replay.json`: it failed to reproduce the nonmatch confirmation. That experiment advanced the inspection only at recorded QR-result times, changed selection timing and could not reconstruct the actual faster worker/command delivery sequence. It is not used as closed-loop proof. The live Gazebo test below supplies that evidence.
 
@@ -51,7 +51,7 @@ Existing reference immutability, stationary read eligibility, target descent, re
 
 The owned `qr-textured-approach` fixture starts after the corridor at N=−18.2, E=−4, with fresh autonomous takeoff to 10 m and an injected test reference. It retains all production QR markers and the unchanged grass/red world. It travels through the area that caused the user's failure, inspects the real nonmatch at N=−17, E=−4, then finds the matching target at N=−10.2, E=−3 beside red.
 
-GUI diagnostics were enabled. Evidence: `world/integration/artifacts/qr_textured_fix_20261008_01/`. Independent evaluator: `coverage_mission/evaluate_qr_red_run.py`. **18/18 checks passed; manager exit 0; terminal state `TARGET_HOLD_5M`.**
+GUI diagnostics were enabled. Evidence: `simulation/integration/artifacts/qr_textured_fix_20261008_01/`. Independent evaluator: `coverage_mission/evaluate_qr_red_run.py`. **18/18 checks passed; manager exit 0; terminal state `TARGET_HOLD_5M`.**
 
 | Measurement | Result |
 | --- | --- |
@@ -84,8 +84,8 @@ Pi execution time, real image calibration/exposure and outdoor readability remai
 From the repository root, with no simulator already occupying port 5760, choose a fresh output directory:
 
 ```bash
-python3 -m world.integration.qr_gazebo_validation --scenario qr-textured-approach --seconds 220 --gui --output world/integration/artifacts/qr_textured_manual_02
-python3 -m coverage_mission.evaluate_qr_red_run world/integration/artifacts/qr_textured_manual_02
+python3 -m simulation.integration.qr_gazebo_validation --scenario qr-textured-approach --seconds 220 --gui --output simulation/integration/artifacts/qr_textured_manual_02
+python3 -m coverage_mission.evaluate_qr_red_run simulation/integration/artifacts/qr_textured_manual_02
 ```
 
 The regular full-mission launch commands still use the normal initial reference and full return/landing. They do not use the private test reference injection.

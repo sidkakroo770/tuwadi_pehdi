@@ -14,7 +14,7 @@ The allowance still requires the configured entrance position, width, altitude a
 
 ## Front camera and orange-mask display
 
-`world/integration/experimental_corridor_manager.py` suspends forward-image acquisition after outbound `CORRIDOR_EXITED`, i.e. completion of exit detection, and closes the green preview. It unsubscribes from the forward image topic, clears cached frames/timestamps and rejects in-flight callbacks using a capture generation. No front-image decoding continues in the mission during the coverage/QR/transit phases.
+`simulation/integration/mission_manager.py` suspends forward-image acquisition after outbound `CORRIDOR_EXITED`, i.e. completion of exit detection, and closes the green preview. It unsubscribes from the forward image topic, clears cached frames/timestamps and rejects in-flight callbacks using a capture generation. No front-image decoding continues in the mission during the coverage/QR/transit phases.
 
 The return approach lazily resumes the same front-camera subscription when `RETURN_FRONT` starts and waits for newly received frames. Old cached green-camera frames cannot be reused. The clock-continuity gate is preserved across this deliberate acquisition gap. LiDAR and downward-camera acquisition continue independently.
 
@@ -28,7 +28,7 @@ This turns off **mission subscription, decoding and preview** during the unused 
 - Replaying the retained failed position and map with a missing front proposal now gives `HOLD`, reason `Waiting for fresh orange approach proposal`, with all three velocity components zero. The ordinary field fence and entrance clearance were not changed.
 - A GUI-enabled targeted return Gazebo flight passed **9/9 independent checks**, including positive orange entry readiness, reverse native corridor exit, red clearance, roof/wall clearance, independent exterior touchdown and fresh FC on-ground/disarmed confirmation.
 
-Evidence: `world/integration/artifacts/return_hold_fix_20261008_02/`.
+Evidence: `simulation/integration/artifacts/return_hold_fix_20261008_02/`.
 
 | Measurement | Result |
 | --- | --- |
@@ -51,8 +51,8 @@ This is a targeted return validation with an injected fixture reference; it skip
 From the repository root, choose a fresh output directory and unused instance:
 
 ```bash
-python3 -m world.integration.qr_gazebo_validation --scenario return-entry --instance 1 --seconds 320 --gui --output world/integration/artifacts/return_hold_manual_03
-python3 -m coverage_mission.evaluate_return_run world/integration/artifacts/return_hold_manual_03
+python3 -m simulation.integration.qr_gazebo_validation --scenario return-entry --instance 1 --seconds 320 --gui --output simulation/integration/artifacts/return_hold_manual_03
+python3 -m coverage_mission.evaluate_return_run simulation/integration/artifacts/return_hold_manual_03
 ```
 
 Normal full-mission commands remain unchanged. Hardware restart behaviour, camera timing and Pi throughput remain to be measured.

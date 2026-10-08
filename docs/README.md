@@ -8,4 +8,4 @@ The repository documentation is grouped by purpose:
 - `reviews/` — engineering reviews and audits.
 - `archive/` — historical handoff copies retained for traceability.
 
-The operational handoff remains `../world/HANDOFF.md`; the Pi-specific handoff is `../world/integration/PI_HARDWARE_HANDOFF.md`.
+The operational handoff remains `../simulation/HANDOFF.md`; the Pi-specific handoff is `../simulation/integration/PI_HARDWARE_HANDOFF.md`.
