@@ -43,20 +43,11 @@ from gz.msgs10.laserscan_pb2 import LaserScan
 HOME = Path.home()
 MISSION_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(MISSION_ROOT))
+sys.path.insert(0, str(MISSION_ROOT / "src"))
 
-APPROACH_ROOT = (
-    HOME
-    / "tuwadi_pehdi"
-    / "src"
-    / "approach"
-)
+APPROACH_ROOT = MISSION_ROOT / "src" / "approach"
 
-CORRIDOR_ROOT = (
-    HOME
-    / "tuwadi_pehdi"
-    / "src"
-    / "corridor"
-)
+CORRIDOR_ROOT = MISSION_ROOT / "src" / "corridor"
 
 sys.path.insert(
     0,
@@ -1318,7 +1309,7 @@ def main() -> int:
     parser.add_argument(
         "--debug-output",
         type=Path,
-        default=HOME / "tuwadi_pehdi/simulation/integration/artifacts/preentry_capture",
+        default=MISSION_ROOT / "simulation/integration/artifacts/preentry_capture",
         help="Persistent directory for the first real PRE_ENTRY LiDAR capture",
     )
     args = parser.parse_args()

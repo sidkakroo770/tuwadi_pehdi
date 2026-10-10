@@ -8,7 +8,10 @@ import argparse
 import json
 from pathlib import Path
 import resource
+import sys
 import time
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'src'))
 
 import cv2
 

@@ -74,7 +74,7 @@ def test_takeoff_requires_altitude_feedback_and_stops_on_mode_loss():
 
 
 def captured_scan(stamp):
-    source = Path(__file__).parent / "artifacts/preentry_capture/preentry_scan.npz"
+    source = Path(__file__).parents[2] / "tests/fixtures/preentry_scan.npz"
     with np.load(source) as data:
         return NativeScan(data["angles_rad"], data["ranges_m"],
                           np.zeros(len(data["ranges_m"])), stamp,

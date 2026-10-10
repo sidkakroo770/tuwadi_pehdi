@@ -10,7 +10,7 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 from .config import Config
 
-ROOT=Path(__file__).resolve().parents[1]
+ROOT=Path(__file__).resolve().parents[2]
 
 
 def element(parent,tag,text=None,**attrs):
@@ -95,7 +95,7 @@ def build(config,output,scenario='central',spawn_yaw=0,real_time_factor=1,instan
 
 
 def main():
-    p=argparse.ArgumentParser(); p.add_argument('--config',type=Path,default=ROOT/'config/coverage.json')
+    p=argparse.ArgumentParser(); p.add_argument('--config',type=Path,default=ROOT/'config/full_mission_coverage.json')
     p.add_argument('--output',type=Path,default=ROOT/'artifacts/gazebo_fixture')
     p.add_argument('--scenario',choices=['clear','central','multiple','row_end','row_end_open','incursion','edge','partial'],default='central')
     a=p.parse_args(); build(a.config,a.output,a.scenario)

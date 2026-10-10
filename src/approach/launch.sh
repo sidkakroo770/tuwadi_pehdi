@@ -264,7 +264,7 @@ gnome-terminal \
         echo '=============================================='
         echo ''
 
-        python3 autonomy/behaviors/mission_runner.py
+        PYTHONPATH='$REPO/src:$REPO/src/approach:$GZ_PYTHON_PATH' python3 src/approach/autonomy/behaviors/mission_runner.py
 
         echo ''
         echo 'Mission Runner closed.'

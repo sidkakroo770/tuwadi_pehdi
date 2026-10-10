@@ -27,9 +27,10 @@ rpicam-hello --list-cameras
 python3 -c 'from picamera2 import Picamera2; print(Picamera2.global_camera_info())'
 ```
 
-From the `[competition]_mission2` repository root, substitute the observed indexes:
+From the `tuwadi_pehdi` repository root, substitute the observed indexes:
 
 ```bash
+source tools/env.sh
 python3 -m simulation.integration.pi_camera_benchmark \
   --front-index 0 --downward-index 1 --seconds 120 \
   --output artifacts/pi_camera_benchmark.json

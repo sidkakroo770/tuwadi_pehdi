@@ -63,6 +63,7 @@ Implementation date: 2026-10-08. This extends the [competition] mission; physica
 Run from the repository root, with Gazebo, the existing ArduPilot build and MAVProxy installed. No other simulator may occupy TCP 5760 / the default JSON physics ports. The harness owns and cleans up only processes it starts.
 
 ```bash
+source tools/env.sh
 python3 -m pip install --user -r requirements/qr.txt
 # If libzbar is missing: sudo apt install libzbar0
 python3 simulation/integration/build_qr_assets.py

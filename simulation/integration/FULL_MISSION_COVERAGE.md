@@ -71,8 +71,8 @@ export GZ_IP=127.0.0.1
 export GZ_PARTITION=miss2_integrated
 export GZ_DISCOVERY_MULTICAST_IP=239.255.0.7
 export GZ_SIM_SYSTEM_PLUGIN_PATH=/home/sid/ardupilot_gazebo/build
-export GZ_SIM_RESOURCE_PATH=/home/sid/[competition]_mission2/simulation/models/models:/home/sid/ardupilot_gazebo/models
-gz sim -r -v2 /home/sid/[competition]_mission2/simulation/worlds/miss2_full_world.sdf
+export GZ_SIM_RESOURCE_PATH=/home/sid/tuwadi_pehdi/simulation/models/models:/home/sid/ardupilot_gazebo/models
+gz sim -r -v2 /home/sid/tuwadi_pehdi/simulation/worlds/miss2_full_world.sdf
 ```
 
 Second terminal:
@@ -81,7 +81,7 @@ Second terminal:
 cd /home/sid/ardupilot/ArduCopter
 ../Tools/autotest/sim_vehicle.py -v ArduCopter -f gazebo-iris \
   --model JSON --no-mavproxy \
-  --use-dir /home/sid/[competition]_mission2/simulation/integration/artifacts/full_sitl_smoke
+  --use-dir /home/sid/tuwadi_pehdi/simulation/integration/artifacts/full_sitl_smoke
 ```
 
 Third terminal:
@@ -107,8 +107,8 @@ export GZ_DISCOVERY_MULTICAST_IP=239.255.0.7
 export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 export OPENBLAS_NUM_THREADS=1
 export OMP_NUM_THREADS=1
-export PYTHONPATH=/home/sid/[competition]_mission2:/home/sid/[competition]_mission2/approach:/home/sid/[competition]_mission2/corridor:/usr/lib/python3/dist-packages
-python3 -u /home/sid/[competition]_mission2/simulation/integration/mission_manager.py \
+export PYTHONPATH=/home/sid/tuwadi_pehdi/src:/home/sid/tuwadi_pehdi:/home/sid/tuwadi_pehdi/src/approach:/home/sid/tuwadi_pehdi/src/corridor:/usr/lib/python3/dist-packages
+python3 -u /home/sid/tuwadi_pehdi/simulation/integration/mission_manager.py \
   --start-mission --coverage-only --takeoff-altitude 3 \
   --mavlink udpin:0.0.0.0:14552 --banner-loss-frames 5 \
   --coverage-max-wall-seconds 7200
@@ -119,27 +119,27 @@ result are written under `simulation/integration/artifacts/coverage_runtime.*`.
 The manager exits nonzero on abort.
 
 For an independent pose trace, start this **before the manager** with the
-same Gazebo environment and `PYTHONPATH=/home/sid/[competition]_mission2`:
+same Gazebo environment and `PYTHONPATH=/home/sid/tuwadi_pehdi/src:/home/sid/tuwadi_pehdi`:
 
 ```bash
 python3 -m coverage_mission.truth_monitor \
-  --config /home/sid/[competition]_mission2/config/full_mission_coverage.json \
+  --config /home/sid/tuwadi_pehdi/config/full_mission_coverage.json \
   --zone -9 -6 -4 -2 --zone -2.25 7.75 -5.11 2.32 \
   --zone 8 11 6 8 \
   --model-name iris_miss2_full \
   --pose-topic /world/miss2_world/pose/info \
   --ground-z 0.0731022 \
-  --output /home/sid/[competition]_mission2/simulation/integration/artifacts/full_truth.jsonl \
+  --output /home/sid/tuwadi_pehdi/simulation/integration/artifacts/full_truth.jsonl \
   --seconds 7400
 ```
 
 After a completed trace, independent evaluation is:
 
 ```bash
-PYTHONPATH=/home/sid/[competition]_mission2 python3 -m coverage_mission.evaluate_run \
-  --mission /home/sid/[competition]_mission2/simulation/integration/artifacts/coverage_runtime.jsonl \
-  --truth /home/sid/[competition]_mission2/simulation/integration/artifacts/full_truth.jsonl \
-  --output /home/sid/[competition]_mission2/simulation/integration/artifacts/full_evaluation.json
+PYTHONPATH=/home/sid/tuwadi_pehdi/src:/home/sid/tuwadi_pehdi python3 -m coverage_mission.evaluate_run \
+  --mission /home/sid/tuwadi_pehdi/simulation/integration/artifacts/coverage_runtime.jsonl \
+  --truth /home/sid/tuwadi_pehdi/simulation/integration/artifacts/full_truth.jsonl \
+  --output /home/sid/tuwadi_pehdi/simulation/integration/artifacts/full_evaluation.json
 ```
 
 This is still a Gazebo adapter: it uses Gazebo image/clock topics and a
@@ -371,13 +371,13 @@ offline tests passing**; full-world Gazebo remains **not yet proven COMPLETE**.
 Use the quick regression loop before any further long flight:
 
 ```bash
-cd /home/sid/[competition]_mission2
-PYTHONPATH=/home/sid/[competition]_mission2 OPENBLAS_NUM_THREADS=1 \
+cd /home/sid/tuwadi_pehdi
+PYTHONPATH=/home/sid/tuwadi_pehdi/src:/home/sid/tuwadi_pehdi OPENBLAS_NUM_THREADS=1 \
   python3 -m coverage_mission.replay_saved_map \
   --config config/full_mission_coverage.json \
   --artifact-dir simulation/integration/artifacts/full_neutral_20261007
-PYTHONPATH=/home/sid/[competition]_mission2:/home/sid/[competition]_mission2/approach:/home/sid/[competition]_mission2/corridor:/home/sid/[competition]_mission2/simulation/integration:/usr/lib/python3/dist-packages \
-  OPENBLAS_NUM_THREADS=1 python3 -m pytest -q coverage_mission \
+PYTHONPATH=/home/sid/tuwadi_pehdi/src:/home/sid/tuwadi_pehdi:/home/sid/tuwadi_pehdi/src/approach:/home/sid/tuwadi_pehdi/src/corridor:/home/sid/tuwadi_pehdi/simulation/integration:/usr/lib/python3/dist-packages \
+  OPENBLAS_NUM_THREADS=1 python3 -m pytest -q src/coverage_mission \
   simulation/integration/test_camera_pose_integrity.py \
   simulation/integration/test_corridor_altitude.py \
   simulation/integration/test_coverage_handoff.py \
